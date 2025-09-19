@@ -11,7 +11,7 @@ class ShellProvisioningService(IVPNProvisioningService):
 
     async def provision(self, node_id: int, client_name: str) -> VPNClient:
         script = f"{self.base_dir}/addClient.sh"
-        subprocess.run([script, client_name], check=True)
+        subprocess.run(["bash", script, client_name], check=True)
         return VPNClient(
             name=client_name,
             node_id=node_id,
@@ -20,4 +20,4 @@ class ShellProvisioningService(IVPNProvisioningService):
 
     async def revoke(self, node_id: int, client_name: str) -> None:
         script = f"{self.base_dir}/delClient.sh"
-        subprocess.run([script, client_name], check=True)
+        subprocess.run(["bash", script, client_name], check=True)

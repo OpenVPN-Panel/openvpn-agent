@@ -3,8 +3,8 @@ services:
     build: .
     container_name: openvpn-agent
     volumes:
-      - ./openvpn-data/server:/etc/openvpn/server
-      - ./openvpn-data/home:/root/openvpn/
-      - ./scripts:/root/openvpn/scripts
+      - ${HOME}/openvpn-utils/openvpn-data/server:/etc/openvpn/server
+      - ${HOME}/openvpn-utils/openvpn-data/home:/root/openvpn/
+      - ${HOME}/openvpn-utils/scripts:/root/openvpn/scripts
     environment:
       - SCRIPTS_DIR=/root/openvpn/scripts
