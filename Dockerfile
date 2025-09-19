@@ -12,6 +12,6 @@ COPY src ./src
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi --without dev
 
-EXPOSE 8000
+EXPOSE 48000
 
-CMD ["uvicorn", "src.presentation.main:app", "--host", "0.0.0.0", "--port", "${API_PORT}"]
+CMD ["uvicorn", "src.presentation.main:app", "--host", "0.0.0.0", "--port", "48000"]
