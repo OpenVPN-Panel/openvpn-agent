@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     mgmt_address: str = "192.168.1.42"
     mgmt_port: int = 55555
     scripts_dir: str = "/root/openvpn/scripts"
+    client_config_dir: str = "/root/openvpn/clients-configs/files"
 
     # model_config = SettingsConfigDict(
     #     env_file=ROOT_PATH / ".env",

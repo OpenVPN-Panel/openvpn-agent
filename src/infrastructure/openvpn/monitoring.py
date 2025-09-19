@@ -17,7 +17,6 @@ class TelnetMonitoringService(IVPNMonitoringService):
     async def list_sessions(self, node_id: int) -> list[VPNSession]:
         reader, writer = await asyncio.open_connection(self.host, self.port)
 
-
         line = await reader.readline()
         print("GREETING:", line.decode().strip())
 

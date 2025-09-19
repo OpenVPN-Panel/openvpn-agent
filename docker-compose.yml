@@ -8,6 +8,7 @@ services:
       - ${HOME}/openvpn-utils/scripts:/root/openvpn/scripts
     environment:
       - SCRIPTS_DIR=/root/openvpn/scripts
+      - CLIENT_CONFIG_DIR=/root/openvpn/clients-configs/files
       - MGMT_PORT=55555
       - MGMT_ADDRESS=127.0.0.1
     network_mode: host
