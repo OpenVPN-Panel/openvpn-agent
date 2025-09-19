@@ -8,23 +8,33 @@ from src.domain.vpn.entities import VPNSession
 class TelnetMonitoringService(IVPNMonitoringService):
     def __init__(
         self,
-        host: str = "55.55.55.55",
-        port: int = 555,
+        host: str = "127.0.0.1",
+        port: int = 55555,
     ):
         self.host = host
         self.port = port
 
     async def list_sessions(self, node_id: int) -> list[VPNSession]:
         reader, writer = await asyncio.open_connection(self.host, self.port)
+
+
+        line = await reader.readline()
+        print("GREETING:", line.decode().strip())
+
         writer.write(b"status 3\n")
         await writer.drain()
 
         sessions: list[VPNSession] = []
 
-        async for line in reader:
-            line = line.decode().strip()
-            if line.startswith("CLIENT_LIST"):
-                parts = line.strip().split("\t")
+        while True:
+            line = await reader.readline()
+            if not line:
+                break
+
+            decoded = line.decode().strip()
+
+            if decoded.startswith("CLIENT_LIST"):
+                parts = decoded.split("\t")
                 print(parts)
                 (
                     _,
@@ -55,7 +65,8 @@ class TelnetMonitoringService(IVPNMonitoringService):
                         cipher=cipher,
                     )
                 )
-            elif line.startswith("ROUTING_TABLE"):
+
+            elif decoded == "END":  # правильный стоп
                 break
 
         writer.write(b"exit\n")

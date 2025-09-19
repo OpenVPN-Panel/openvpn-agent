@@ -7,7 +7,7 @@ ROOT_PATH = Path(sys.path[1])
 
 
 class Settings(BaseSettings):
-    mgmt_address: str = "127.0.0.1"
+    mgmt_address: str = "192.168.1.42"
     mgmt_port: int = 55555
     scripts_dir: str = "/root/openvpn/scripts"
 
