@@ -7,7 +7,10 @@ from starlette.responses import FileResponse
 
 from src.application.vpn.handlers import VPNHandlers
 from src.infrastructure.di import get_vpn_handlers
-from src.infrastructure.exceptions import ClientConfigFileNotFound
+from src.infrastructure.exceptions import (
+    ClientConfigFileNotFound,
+    ClientConfigFileAlreadyExist,
+)
 
 vpn_agent_router = APIRouter(prefix="/vpn-agent", tags=["VPN Agent"])
 
@@ -22,31 +25,37 @@ async def get_vpn_sessions(handlers: VPNHandlers = Depends(get_vpn_handlers)):
 
 
 @vpn_agent_router.get("/clients/{client_name}/config/download")
-async def get_vpn_sessions(
-        client_name: str,
-        handlers: VPNHandlers = Depends(get_vpn_handlers)
+async def get_vpn_client_config(
+    client_name: str, handlers: VPNHandlers = Depends(get_vpn_handlers)
 ):
     try:
         file_path: Path = await handlers.provisioning.get_config(1, client_name)
         return FileResponse(
             path=file_path,
             filename=f"{client_name}.ovpn",
-            media_type="application/octet-stream"
+            media_type="application/octet-stream",
         )
     except ClientConfigFileNotFound as e:
         return HTTPException(status_code=404, detail={e})
+    except Exception as e:
+        return HTTPException(status_code=500, detail={e})
 
 
 @vpn_agent_router.post("/clients")
 async def create_vpn_client(
-        req: ClientRequest, handlers: VPNHandlers = Depends(get_vpn_handlers)
+    req: ClientRequest, handlers: VPNHandlers = Depends(get_vpn_handlers)
 ):
-    return await handlers.provision_client(node_id=1, client_name=req.name)
+    try:
+        return await handlers.provision_client(node_id=1, client_name=req.name)
+    except ClientConfigFileAlreadyExist as e:
+        return HTTPException(
+            status_code=409, detail={"message": "Client already exists"}
+        )
 
 
 @vpn_agent_router.delete("/clients/{name}")
 async def delete_vpn_client(
-        name: str, handlers: VPNHandlers = Depends(get_vpn_handlers)
+    name: str, handlers: VPNHandlers = Depends(get_vpn_handlers)
 ):
     await handlers.revoke_client(node_id=1, client_name=name)
     return {"status": "revoked"}

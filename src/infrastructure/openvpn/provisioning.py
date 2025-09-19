@@ -1,11 +1,13 @@
 import datetime
 import subprocess
 from pathlib import Path
-from typing import Union
 
 from src.application.interfaces.vpn import IVPNProvisioningService
 from src.domain.vpn.entities import VPNClient
-from src.infrastructure.exceptions import ClientConfigFileNotFound
+from src.infrastructure.exceptions import (
+    ClientConfigFileNotFound,
+    ClientConfigFileAlreadyExist,
+)
 
 
 class ShellProvisioningService(IVPNProvisioningService):
@@ -15,7 +17,15 @@ class ShellProvisioningService(IVPNProvisioningService):
 
     async def provision(self, node_id: int, client_name: str) -> VPNClient:
         script = f"{self.base_dir}/addClient.sh"
-        subprocess.run(["bash", script, client_name], check=True)
+        try:
+            subprocess.run(["bash", script, client_name], check=True)
+        except subprocess.CalledProcessError as e:
+            if e.returncode == 1:
+                raise ClientConfigFileAlreadyExist(
+                    f"Client {client_name} already exists"
+                )
+            raise
+
         return VPNClient(
             name=client_name,
             node_id=node_id,

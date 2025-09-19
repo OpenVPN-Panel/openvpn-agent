@@ -6,8 +6,7 @@ from src.infrastructure.openvpn.provisioning import ShellProvisioningService
 
 def get_vpn_handlers() -> VPNHandlers:
     provisioning = ShellProvisioningService(
-        base_dir=settings.scripts_dir,
-        client_config_dir=settings.client_config_dir
+        base_dir=settings.scripts_dir, client_config_dir=settings.client_config_dir
     )
     monitoring = TelnetMonitoringService(
         host=settings.mgmt_address, port=settings.mgmt_port
